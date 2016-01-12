@@ -1,0 +1,11 @@
+body, html, .inner, .outer {
+      height: 100%;
+   }
+
+
+#myPlot {
+   display: inline-block;
+           height: 50%;
+           width:50%;
+
+}

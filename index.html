@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+   <link rel="stylesheet" type="text/css" href="src/eDTS.css">
+   <link rel="stylesheet" type="text/css" href="style.css">
+   <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+   <script src="src/eDTS.js" ></script>
+
+</head>
+
+<body>
+
+<div id="myPlot"></div>
+
+
+<script>
+
+
+//eDTS.set("parent","myPlot").init();
+
+labels=["date","value"];
+timeFormat="%Y-%m";
+data=[["2015-01",4],["2015-03",8],["2015-08",6],["2016-12",10]];
+
+//eDTS.setLabels(labels).setData(timeFormat,data).showAxis();
+
+eDTS.bind("myPlot").setData(data,timeFormat).init();
+
+
+
+</script>
+
+
+</html
