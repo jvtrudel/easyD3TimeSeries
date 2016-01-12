@@ -15,7 +15,7 @@ Utilitaire «responsive» de visualisation de séries temporelles en Javascript 
   
 ## Exemple d'utilisation
 
-Ajouter les dépendances et les feuilles de styles dans <head>.
+Ajouter les dépendances et les feuilles de styles dans \<head\>.
 
     <link rel="stylesheet" type="text/css" href="src/eDTS.css">
     <link rel="stylesheet" type="text/css" href="style.css">
