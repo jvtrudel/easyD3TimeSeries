@@ -2,9 +2,9 @@
 <html>
 <head>
    <link rel="stylesheet" type="text/css" href="src/eDTS.css">
-   <link rel="stylesheet" type="text/css" href="style.css">
-   <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+   <!--link rel="stylesheet" type="text/css" href="style.css"!-->
+   <script src="//d3js.org/d3.v3.js" charset="utf-8"></script>
+   <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script!-->
    <script src="src/eDTS.js" ></script>
 
 </head>
@@ -13,23 +13,58 @@
 
 <div id="myPlot"></div>
 
+<div id="secondPlot"></div>
+
 
 <script>
 
 
-//eDTS.set("parent","myPlot").init();
 
-labels=["date","value"];
-timeFormat="%Y-%m";
-data=[["2015-01",4],["2015-03",8],["2015-08",6],["2016-12",10]];
+directivesA={
+      title:"Exemple: données fictives",
+      description:"Exemple d'utilisation de eDTS (easy D3 Time Series). ",
+      dataStructure:"tuple",
+      xLabel:"Moments",
+      xDimension:"time",
+      xUnit:"date",
+      xFormat:"%Y-%m",
+      yLabel:"profit (M$)",
+      yDimension:"money",
+      yUnit:"dollar",
+      yFormat:"",
+      rawData:[["2010-01",4],["2011-03",8],["2012-08",6],["2013-12",10],["2014-01",4],["2015-03",8],["2016-08",6],["2017-12",10]]
+   };
 
-//eDTS.setLabels(labels).setData(timeFormat,data).showAxis();
+   directivesB={
+         title:"Exemple: données fictives",
+         description:"Exemple d'utilisation de eDTS (easy D3 Time Series). ",
+         dataStructure:"tuple",
+         xLabel:"Moments",
+         xDimension:"time",
+         xUnit:"date",
+         xFormat:"%Y-%m",
+         yLabel:"profit (M$)",
+         yDimension:"money",
+         yUnit:"dollar",
+         yFormat:"",
+         rawData:[["2010-01",5],["2011-03",18],["2012-08",3],["2013-12",15],["2014-01",7],["2015-03",13],["2016-08",11],["2017-12",9]]
+      };
 
-eDTS.bind("myPlot").setData(data,timeFormat).init();
+
+var p1=new eDTS()
+     .update("insertData",directivesA)
+     .bindSVG("myPlot")
+     .update("showGraph");
+
+var p2=new eDTS()
+          .update("insertData",directivesB)
+          .bindSVG("secondPlot")
+          .update("showGraph");
+
 
 
 
 </script>
 
 
-</html
+</html>

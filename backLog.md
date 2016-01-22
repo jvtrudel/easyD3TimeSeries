@@ -1,21 +1,40 @@
+# Prochain Sprint
+
+  - ajouter un padding intérieur (pour que l'on puisse voir toutes les données).
+  - responsivité
+
+
+
 # Ajout de fonctionalités
 
   - Entrée des data selon le type (array, objet, csv ou json)
-  - possibilité d'avoir plusieurs images (-> new object function) dans un même document.
+
+
+# Amélioration de fonctionalités
+
+  - parser
+    - meilleur cohérence de dimension/unités/format
+    - valeurs par défauts pour dimensions.
+    - ajout de dimensions (... selon le besoin)
+    - format entré et format sortie.
+
+
+  # Amélioration du design visuel
+
+    - Définir des classes pour les éléments SVG.
+    - Définir des options de style par défaut (eDTS.css)
+    - Visibilité des aves et responsivité.
+
+# Responsivité
 
 
 # Amélioration de l'ergonomie
 
-  - Éliminer les dépendances à jQuery
-  - supprimer la dépendance au css externe pour définir les dimensions.
-
 
 # Amélioration des performances
 
-# Amélioration du design visuel
+  - améliorer updateGraph  
 
-  - Définir des options de style par défaut (eDTS.css)
-  - Visibilité des aves et responsivité.
 
 # Enjeux importants
 

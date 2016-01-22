@@ -2,9 +2,8 @@ body {
   font: 10px sans-serif;
 }
 
-.axis path {
-  display: none;
-}
+
+
 
 .axis line {
   shape-rendering: crispEdges;

@@ -1,128 +1,242 @@
-eDTS={
-   options:{// should use a standard graphics grammar...
-      "axesMethod":"default",
-      "id":"none",
-      "xLabel":"X (x unit)",
-      "yLabel":"Y (y unit)",
-      "margin": {top: 20, right: 20, bottom: 30, left: 50},
+var eDTS=function eDTS(){
 
-      "width": 960, //total width
-      "height": 500  //total height
+   state={alreadyPlotted:false};
 
-   },
-   bind:function(id){//bind to an id
-      this.options.id=id;
-      var rect=document.getElementById(id).getBoundingClientRect();
-      var xpad=rect.width*5/100;
-      var ypad=rect.height*5/100;
-      this.options.margin={top:ypad/2,right:xpad/2,bottom:ypad/2,left:xpad/2};
-      this.options.width=rect.width - xpad;
-      this.options.height=rect.height - ypad;
-      // padding inside axis...
-      return this;
-   },
-   set: function (opt){
-      for (var key in opt){
-         this.options[key]=opt[key];
+   data={
+      title:"",
+      description:"",
+      dataStructure:"",
+      xUnit:"",
+      xLabel:"",
+      xFormat:"",
+      yUnit:"",
+      yLabel:"",
+      yFormat:"",
+      rawData:[]
+   };
+
+
+    parameters={
+      margin:{top: 20, right: 20, bottom: 30, left: 50},
+      padding:{},
+      scene:{width:960,height:500}
+   }
+
+   operators={
+      xParser:undefined,
+      yparser:undefined
+   };
+
+
+    treatData=function(){
+
+        // selection des Parsers de données
+
+        operators.xParser=parserSelector(data.xDimension,data.xUnit,data.xFormat);
+        operators.yParser=parserSelector(data.yDimension,data.yUnit,data.yFormat);
+
+   };
+
+    treatParameters=function(){
+   //   console.log("treatParameters");
+      parameters.width=parameters.scene.width + parameters.margin.left + parameters.margin.right;
+      parameters.height=parameters.scene.height + parameters.margin.top + parameters.margin.bottom;
+   };
+
+// interface
+  this.update=function(command, inData){
+   //  console.log(command=="showGraph");
+      switch (command) {
+         case("insertData"):
+             for (key in inData){
+                data[key]=inData[key];
+             }
+            break;
+         case("showGraph"):
+             if (state.alreadyPlotted){
+                updateGraph();
+             }else{
+                newGraph();
+             }
+
+             break;
+         default:
+            console.log("commande inconnue ou inexistante");
+            break;
       }
       return this;
-   },
-
-  setData:function(data,timeFormat){
-     this.data=data.map(function(elem){return[d3.time.format(timeFormat).parse(elem[0]),elem[1]]});
-     this.minX = this.data[0][0];
-     this.maxX = this.data[this.data.length-1][0];
-     this.minY=Math.min(...data.map(function(elem){return elem[1]}));
-     this.maxY=Math.max(...data.map(function(elem){return elem[1]}));
-     return this;
- },
+   };
 
 
 
+   this.bindSVG=function(container_id){
 
-init:function(){
-//   var margin = {top: 20, right: 0, bottom: 20, left: 0},
-//   width = 960 - margin.left - margin.right,
-//   height = 500 - margin.top - margin.bottom;
+      this.id=container_id;
+      treatParameters();
+      d3.select("#"+this.id).append("svg")
+        .attr("id", this.id+"-svg")
+        .attr("width", parameters.width )
+        .attr("height", parameters.height)
+        .attr("viewbox","0 0 "+(parameters.width)+" "+(parameters.height))
+        .attr("preserveAspectRatio","xMinYMin")
 
-var chart = $("#"+eDTS.options.id);
-console.log(eDTS.options.id);
-var rect=document.getElementById(eDTS.options.id).getBoundingClientRect();
-    aspect = rect.width / rect.height;
-$(window).on("resize", function() {
-   var rect=document.getElementById(eDTS.options.id).getBoundingClientRect();
-    var chart = $("#itrf");
-    console.log(chart);
-    chart.attr("width", rect.width);
-    chart.attr("height", Math.round(rect.width/ aspect));
-}).trigger("resize");
 
-var formatNumber = d3.format(".1f");
-
-var y = d3.scale.linear()
-   .domain([this.minY, this.maxY])
-   .range([this.options.height, 0]);
-
-var x = d3.time.scale()
-   .domain([this.minX, this.maxX])
-   .nice(d3.time.week)
-   .range([0, this.options.width]);
-
-var xAxis = d3.svg.axis()
-   .scale(x)
-   .ticks(d3.time.years)
-   .orient("bottom");
-
-var yAxis = d3.svg.axis()
-   .scale(y)
-   .tickSize(this.options.width)
-   //.tickFormat(formatCurrency)
-   .orient("right");
-
-var svg = d3.select("#"+this.options.id).append("svg")
-   .attr("width", this.options.width + this.options.margin.left + this.options.margin.right)
-   .attr("height", this.options.height + this.options.margin.top + this.options.margin.bottom)
-   .attr("id","itrf")
-   .attr("viewBox", "0 0 "+this.options.width+" "+this.options.height)
-   .attr("preserveAspectRatio","xMinYMid")
-   .append("g")
-   .attr("transform", "translate(" + this.options.margin.left + "," + this.options.margin.top + ")");
-
-svg.append("g")
-   .attr("class", "x axis")
-   .attr("transform", "translate(0," + this.options.height + ")")
-   .call(xAxis);
-
-var gy = svg.append("g")
-   .attr("class", "y axis")
-   .call(yAxis);
-
-gy.selectAll("g").filter(function(d) { return d; })
-   .classed("minor", true);
-
-gy.selectAll("text")
-   .attr("x", 0)
-   .attr("dy", -5);
-
-var lineGen=d3.svg.line()
-   .x(function(d){return x(d[0])})
-   .y(function(d){return y(d[1])})
-
-svg.append('svg:path')
-   .attr('d',lineGen(this.data))
+      return this;
+   };
 
 
 
-function formatCurrency(d) {
- var s = formatNumber(d );
- return d === y.domain()[1]
-     ? "$" + s + " million"
-     : s;
+   updateGraph=function(){
+
+      treatData();
+
+       var x = d3.time.scale()
+          .range([0, parameters.scene.width]);
+
+       var y = d3.scale.linear()
+          .range([parameters.scene.height, 0]);
+
+       var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom");
+
+       var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient("left");
+
+       var line = d3.svg.line()
+          .x(function(d) { return x(operators.xParser.parse(d[0])); })
+          .y(function(d) { return y(operators.yParser.parse(d[1])); });
+
+
+
+       x.domain(d3.extent(data.rawData, function(d) { return operators.xParser.parse(d[0]); }));
+       y.domain(d3.extent(data.rawData, function(d) { return operators.yParser.parse(d[1]); }));
+
+
+       svg=d3.select("#"+this.id+"-svg").selectAll("*").remove();
+
+         svg=d3.select("#"+this.id+"-svg").append("g")
+         .attr("transform", "translate(" + parameters.margin.left + "," + parameters.margin.top + ")")
+
+         svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + parameters.scene.height + ")")
+            .call(xAxis);
+
+      svg.append("g")
+            .attr("class", "y axis")
+       //     .attr("transform", "translate(" + parameters.scene.width + ",0)")
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text(data.yLabel);
+
+       svg.append("path")
+           .datum(data.rawData)
+           .attr("class", "line")
+           .attr("d", line);
+
+    state.alreadyPlotted=true;
+    return this;
+ }.bind(this);
+
+   newGraph=function(){
+      // is this grap bounded?
+
+     treatData();
+
+      var x = d3.time.scale()
+         .range([0, parameters.scene.width]);
+
+      var y = d3.scale.linear()
+         .range([parameters.scene.height, 0]);
+
+      var xAxis = d3.svg.axis()
+         .scale(x)
+         .orient("bottom");
+
+      var yAxis = d3.svg.axis()
+         .scale(y)
+         .orient("left");
+
+      var line = d3.svg.line()
+         .x(function(d) { return x(operators.xParser.parse(d[0])); })
+         .y(function(d) { return y(operators.yParser.parse(d[1])); });
+
+
+
+      x.domain(d3.extent(data.rawData, function(d) { return operators.xParser.parse(d[0]); }));
+      y.domain(d3.extent(data.rawData, function(d) { return operators.yParser.parse(d[1]); }));
+
+
+      svg=d3.select("#"+this.id+"-svg").append("g")
+        .attr("class",this.id+"-viz")
+        .attr("transform", "translate(" + parameters.margin.left + "," + parameters.margin.top + ")")
+
+        svg.append("g")
+           .attr("class", "x axis")
+           .attr("transform", "translate(0," + parameters.scene.height + ")")
+           .call(xAxis);
+
+     svg.append("g")
+           .attr("class", "y axis")
+      //     .attr("transform", "translate(" + parameters.scene.width + ",0)")
+           .call(yAxis)
+           .append("text")
+           .attr("transform", "rotate(-90)")
+           .attr("y", 6)
+           .attr("dy", ".71em")
+           .style("text-anchor", "end")
+           .text(data.yLabel);
+
+      svg.append("path")
+          .datum(data.rawData)
+          .attr("class", "line")
+          .attr("d", line);
+
+   state.alreadyPlotted=true;
+   return this;
+}.bind(this);
+
+
+
+
+
+   return this;
 }
-return this;
-}
 
 
 
 
-}
+function parserSelector(dimension,unit,format){
+   switch (dimension) {
+      case "time":
+           switch (unit) {
+              case "date":
+                 return d3.time.format(format);
+                 break;
+              case "delay":
+                  return d3.time.format(format);
+              default:
+
+           }
+      case "money":
+         switch (unit) {
+            case "dollar":
+               return function(){
+                  this.parse=function(value){return +value;};
+                  return this}();
+               break;
+            default:
+
+         }
+         break;
+      default:
+         console.log("dimension inconnue ou inexistante");
+
+   }
+};
